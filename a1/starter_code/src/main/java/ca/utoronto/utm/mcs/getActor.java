@@ -48,7 +48,7 @@ public class getActor implements HttpHandler {
         }
 
         System.out.println(actorId);
-        String name;
+        String name = "";
         List<Object> movies = new ArrayList<>();
 
         if (statusCode == 200) {
@@ -76,7 +76,7 @@ public class getActor implements HttpHandler {
         JSONArray movieIds = new JSONArray();
         json.put("actorId", actorId);
         json.put("name", name);
-        for (int i = 0; i < actorIds.size(); i++) {
+        for (int i = 0; i < movies.size(); i++) {
             movieIds.put(movies.get(i).toString());
         }
         json.put("movies", movieIds);
