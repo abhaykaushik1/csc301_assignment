@@ -81,10 +81,9 @@ public class getActor implements HttpHandler {
         }
         json.put("movies", movieIds);
 
-        r.sendResponseHeaders(statusCode, jsonObject.toString().length());
+        r.sendResponseHeaders(statusCode, json.toString().length());
         OutputStream os = r.getResponseBody();
-        os.write(jsonObject.toString().getBytes());
+        os.write(json.toString().getBytes());
         os.close();
     }
-
 }
