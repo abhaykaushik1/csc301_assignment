@@ -51,7 +51,7 @@ public class hasRelationship implements HttpHandler {
         System.out.println(actorId);
         System.out.println(movieId);
 
-        boolean relationship = false;
+        boolean relationship;
 
         if (statusCode == 200) {
 
@@ -64,7 +64,7 @@ public class hasRelationship implements HttpHandler {
                 if (node_boolean1.hasNext() && node_boolean2.hasNext()) {
                     Result node_relationship = session.run("MATCH (a:actor {id:\""+ actorId +"\"}),(m:movie {movieId:\"" + movieId + "\"}) RETURN EXISTS( (a)-[:ACTED_IN]-(m) )");
                     String relationship_ = node_relationship.next().get(0).asNode().get("hasRelationship").toString().replaceAll("\"", "");
-                    if (relationship_ == "false") {relationship = false;} else {relationship = true;}
+                    if (relationship_.equals("false")) {relationship = false;} else {relationship = true;}
                 }
                 else {
                     System.out.println("Either movie or actor do not exist.");
