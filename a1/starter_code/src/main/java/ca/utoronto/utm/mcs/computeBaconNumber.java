@@ -60,6 +60,7 @@ public class computeBaconNumber implements HttpHandler {
 				// check if movie exists, get actors if it does exist
 				if (node_actor.hasNext()) {
 					
+					// get bacon number
 					Result bacon = session.run("MATCH (n:actor {id: \"" + actorId + "\"}), (m:actor {id: \"nm0000102\"}), p = shortestPath( (n)-[*]-(m) ) RETURN length(p)/2;");
 					if (bacon.hasNext()) {
 						baconNumber = Integer.toString(bacon.list().get(0).get(0).asInt());
