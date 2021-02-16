@@ -6,18 +6,15 @@ import java.io.StringWriter;
 import java.net.InetSocketAddress;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpHandler;
-import java.util.List;
-import org.json.JSONException;
-import org.json.JSONObject;
 import java.io.IOException;
 import org.json.*;
 import org.neo4j.driver.*;
 import java.util.*;
 
 
-public class getMovie implements HttpHandler {
+public class computeBaconNumber implements HttpHandler {
 	
-	public getMovie() {
+	public computeBaconNumber() {
 	}
 
 	@Override
@@ -41,35 +38,40 @@ public class getMovie implements HttpHandler {
 		
 		// check if the body is correctly formatted
 		int statusCode = 200;
-		String movieId = "";
+		String actorId = "";
 
 		// get movieId from request
-		if (deserialized.has("movieId")) {
-			movieId = deserialized.getString("movieId");
+		if (deserialized.has("actorId")) {
+			actorId = deserialized.getString("actorId");
 		}
 		else {
 			statusCode = 400;
 		}
 		
-		System.out.println(movieId);
-		Result node_movie = null;
-		Result node_actors = null;
-		List<Object> actorIds = new ArrayList<>();
-		if (statusCode == 200) {
+		System.out.println(actorId);
+		String baconNumber = null;
+		if (statusCode == 200 && actorId != "nm0000102") {
 			
 			// connect check if node exists with movieId and get the node if it does exist
 			Driver driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "1234"));
 			try (Session session = driver.session()) {
-				node_movie = session.run("MATCH (n:movie {id: \"" + movieId + "\"}) RETURN n;");
+				Result node_actor = session.run("MATCH (n:actor {id: \"" + actorId + "\"}) RETURN n;");
 				
 				// check if movie exists, get actors if it does exist
-				if (node_movie.hasNext()) {
-					node_actors = session.run("MATCH (a:actor),(m:movie) WHERE (m.id = \"" + movieId + "\") AND (a)-[:ACTED_IN]->(m) RETURN collect(a.id);");
-					actorIds = node_actors.list().get(0).get(0).asList();
+				if (node_actor.hasNext()) {
+					
+					Result bacon = session.run("MATCH (n:actor {id: \"" + actorId + "\"}), (m:actor {id: \"nm0000102\"}), p = shortestPath( (n)-[*]-(m) ) RETURN length(p)/2;");
+					if (bacon.hasNext()) {
+						baconNumber = Integer.toString(bacon.list().get(0).get(0).asInt());
+					}
+					else {
+						System.out.println("Error, Bacon path not found");
+						statusCode = 404;
+					}
 				}
 				else {
-					System.out.println("Error, movie doesn't exist");
-					statusCode = 404;
+					System.out.println("Error, actorId does not exist");
+					statusCode = 400;
 				}
 			}
 			catch(Exception e) {
@@ -78,18 +80,14 @@ public class getMovie implements HttpHandler {
 			}
 		}
 		
+		// base case
+		if (actorId == "nm0000102") {
+			baconNumber = "0";
+		}
+		
 		// make json response
 		JSONObject jsonObject = new JSONObject();
-		
-		if (statusCode == 200) {
-			jsonObject.put("name", node_movie.next().get(0).asNode().get("name").toString().replaceAll("\"", ""));
-			JSONArray jsonArray = new JSONArray();
-			for (int i = 0; i < actorIds.size(); i++) {
-				jsonArray.put(actorIds.get(i));
-			}
-			jsonObject.put("movieId", movieId);
-			jsonObject.put("actors", jsonArray);
-		}
+		jsonObject.put("baconNumber", baconNumber);
 		
 		// convert json to string and send 
 		r.sendResponseHeaders(statusCode, jsonObject.toString().length());

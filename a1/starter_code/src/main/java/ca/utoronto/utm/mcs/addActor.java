@@ -60,9 +60,9 @@ public class addActor implements HttpHandler {
 			// connect to db and insert actor is the actor doesn't already exist
 			Driver driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "1234"));
 			try (Session session = driver.session()) {
-				Result node_boolean = session.run("MATCH (n:actor {actorId: " + actorId + "}) RETURN n as bool;");
+				Result node_boolean = session.run("MATCH (n:actor {id: \"" + actorId + "\"}) RETURN n as bool;");
 				if (!(node_boolean.hasNext())) {
-					session.run("CREATE (n:actor {name:\"" + name + "\", actorId:" + actorId + "});");
+					session.run("CREATE (n:actor {name:\"" + name + "\", id:\"" + actorId + "\"});");
 					System.out.println("Transaction complete");
 				}
 				else {
