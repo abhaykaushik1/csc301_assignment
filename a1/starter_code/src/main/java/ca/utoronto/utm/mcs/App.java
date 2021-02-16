@@ -14,7 +14,7 @@ public class App
         //server.createContext("/api/v1/addMovie", new addMovie());
         server.createContext("/api/v1/addRelationship", new addRelationship());
         //server.createContext("/api/v1/getActor", new getActor());
-        //server.createContext("/api/v1/getMovie", new getMovie());
+        server.createContext("/api/v1/getMovie", new getMovie());
         //server.createContext("/api/v1/hasRelationship", new hasRelationship());
         //server.createContext("/api/v1/computeBaconNumber", new computeBaconNumber());
         //server.createContext("/api/v1/computeBaconPath", new computeBaconPath());
