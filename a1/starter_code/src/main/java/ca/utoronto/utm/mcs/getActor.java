@@ -9,6 +9,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpHandler;
 import java.util.List;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
@@ -58,9 +59,9 @@ public class getActor implements HttpHandler {
 
                 if (node_boolean.hasNext()) {
                     Result node_name = session.run("MATCH (n:actor {id: \"" + actorId + "\"}) RETURN n.name;");
+                    name = node_name.next().get(0).asString();
                     Result node_movieIds = session.run("MATCH (a:actor),(m:movie) WHERE (a.id =\"" + actorId + "\") AND (a)-[:ACTED_IN]->(m) RETURN collect(m.id);");
                     movies = node_movieIds.list().get(0).get(0).asList();
-                    name = node_name.next().get(0).asNode().get("name").toString().replaceAll("\"", "");
 
                 } else {
                     statusCode = 404;

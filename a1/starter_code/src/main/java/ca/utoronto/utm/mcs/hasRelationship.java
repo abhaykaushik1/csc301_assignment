@@ -51,20 +51,17 @@ public class hasRelationship implements HttpHandler {
         System.out.println(actorId);
         System.out.println(movieId);
 
-        boolean relationship = false;
+        boolean relationship = true;
 
         if (statusCode == 200) {
 
             Driver driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "1234"));
             try (Session session = driver.session()) {
-                Result node_boolean1 = session.run("MATCH (n:actor {id: \"" + actorId + "\"}) RETURN n as bool;");
-                Result node_boolean2 = session.run("MATCH (n:movie {id: \"" + movieId + "\"}) RETURN n as bool;");
-                System.out.println(node_boolean2);
-                System.out.println(node_boolean1);
+                Result node_boolean1 = session.run("MATCH (n:actor {id: \"" + actorId + "\"}) RETURN n;");
+                Result node_boolean2 = session.run("MATCH (n:movie {id: \"" + movieId + "\"}) RETURN n;");
                 if (node_boolean1.hasNext() && node_boolean2.hasNext()) {
-                    Result node_relationship = session.run("MATCH (a:actor {id:\""+ actorId +"\"}),(m:movie {movieId:\"" + movieId + "\"}) RETURN EXISTS( (a)-[:ACTED_IN]-(m) )");
-                    String relationship_ = node_relationship.next().get(0).asNode().get("hasRelationship").toString().replaceAll("\"", "");
-                    if (relationship_.equals("true")) {relationship = true;}
+                    Result node_relationship = session.run("MATCH (a:actor {id:\""+ actorId +"\"}),(m:movie {id:\"" + movieId + "\"}) RETURN EXISTS( (a)-[:ACTED_IN]-(m) )");
+                    if (node_relationship.next().get(0).toString().equals("FALSE")) {relationship = false;}
                 }
                 else {
                     System.out.println("Either movie or actor do not exist.");
