@@ -56,9 +56,9 @@ public class addMovie implements HttpHandler{
             
             Driver driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "1234"));
             try (Session session = driver.session()) {
-                Result node_boolean = session.run("MATCH (n:movie {name: " + name + "}) RETURN n as bool;");
+                Result node_boolean = session.run("MATCH (n:movie {name: \"" + name + "\"}) RETURN n as bool;");
                 if (!(node_boolean.hasNext())) {
-                    session.run("CREATE (n:movie {name:" + name + ", id:" + movieId + "});");
+                    session.run("CREATE (n:movie {name:\"" + name + "\", id:\"" + movieId + "\"});");
                 }
                 else {
                     System.out.println("Movie already exists with that movieId");
